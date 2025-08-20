@@ -1,0 +1,55 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+import requests
+from typing import Optional
+import uvicorn
+
+app = FastAPI(title="Real Estate MCP Server", version="1.0.0")
+
+class PropertyAnalysis(BaseModel):
+    address: str
+    purchase_price: float
+    monthly_rent: float
+    expenses: float
+    down_payment_percent: float = 20
+
+class DealCriteria(BaseModel):
+    max_price: float
+    min_cash_flow: float
+    max_cap_rate: float
+    location: str
+
+@app.get("/")
+def root():
+    return {"message": "Real Estate MCP Server Running"}
+
+@app.post("/analyze-property")
+def analyze_property(property: PropertyAnalysis):
+    down_payment = property.purchase_price * (property.down_payment_percent / 100)
+    loan_amount = property.purchase_price - down_payment
+    monthly_payment = loan_amount * 0.006  # Rough 7% interest estimate
+    
+    monthly_cash_flow = property.monthly_rent - property.expenses - monthly_payment
+    annual_cash_flow = monthly_cash_flow * 12
+    cap_rate = (annual_cash_flow / property.purchase_price) * 100
+    
+    return {
+        "address": property.address,
+        "monthly_cash_flow": round(monthly_cash_flow, 2),
+        "annual_cash_flow": round(annual_cash_flow, 2),
+        "cap_rate": round(cap_rate, 2),
+        "down_payment_needed": round(down_payment, 2),
+        "recommendation": "Good deal" if monthly_cash_flow > 200 and cap_rate > 8 else "Pass"
+    }
+
+@app.post("/screen-deals")
+def screen_deals(criteria: DealCriteria):
+    # This would connect to real estate APIs in production
+    return {
+        "message": f"Screening deals in {criteria.location}",
+        "criteria": criteria.dict(),
+        "status": "MCP server ready for API connections"
+    }
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
