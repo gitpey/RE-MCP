@@ -1,0 +1,37 @@
+body {
+    font-family: sans-serif;
+    margin: 2em;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2em;
+}
+
+input {
+    padding: 0.5em;
+    margin-right: 1em;
+    font-size: 1em;
+}
+
+button {
+    padding: 0.5em 1em;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+#results-container {
+    margin-top: 2em;
+}
+
+.property {
+    border: 1px solid #ccc;
+    padding: 1em;
+    margin-bottom: 1em;
+    border-radius: 5px;
+}
